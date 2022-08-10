@@ -6,22 +6,22 @@ steps:
     - name: Login to Common Remote DockerHub
      uses: docker/login-action@v1
       with:
-        registry: common-dockerhub-remote.jfrog.teliacompany.io
+        registry: diva.teliacompany.net:7828
         username: ${{ secrets.ARTIFACTORY_READER_USERNAME }}
         password: ${{ secrets.ARTIFACTORY_READER_PASSWORD }}
 
     # Build the Docker image
    - name: Build and tag the Docker image (tag with the destination registry)
-      run: docker build . -t tools-docker-dev-local.jfrog.teliacompany.io/examples/my-test-image:1.0.0
+      run: docker build . -t diva.teliacompany.net:7828/pgw:latest
 
    # Login to the destination repository with credentials with write access
    - name: Login to Common Remote DockerHub
       uses: docker/login-action@v1
       with:
-        registry: tools-docker-dev-local.jfrog.teliacompany.io
+        registry: diva.teliacompany.net:7828
         username: ${{ secrets.ARTIFACTORY_WRITER_USERNAME }}
         password: ${{ secrets.ARTIFACTORY_WRITER_PASSWORD }}
 
     # Push the Docker image to the target registry
     - name: Push Docker image
-      run: docker push tools-docker-dev-local.jfrog.teliacompany.io/examples/my-test-image:1.0.0
+      run: docker push diva.teliacompany.net:7828/pgw:latest
