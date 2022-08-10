@@ -1,0 +1,49 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - uses: actions/checkout@v2
+
+    # Login to the repository containing our base image (in this case our internal DockerHub cache)
+    - name: Login to Common Remote DockerHub
+      uses: docker/login-action@v1
+      with:
+        registry: diva.teliacompany.net:7828
+        username: ${{ secrets.ARTIFACTORY_READER_USERNAME }}
+        password: ${{ secrets.ARTIFACTORY_READER_PASSWORD }}
+
+    # Build the Docker image
+    - name: Build and tag the Docker image (tag with the destination registry)
+      run: docker build . -t diva.teliacompany.net:7828/pgw:latest
+
+   # Login to the destination repository with credentials with write access
+    - name: Login to Common Remote DockerHub
+      uses: docker/login-action@v1
+      with:
+        registry: diva.teliacompany.net:7828
+        username: ${{ secrets.ARTIFACTORY_WRITER_USERNAME }}
+        password: ${{ secrets.ARTIFACTORY_WRITER_PASSWORD }}
+
+    # Push the Docker image to the target registry
+    - name: Push Docker image
+      run: docker push diva.teliacompany.net:7828/pgw:latest
